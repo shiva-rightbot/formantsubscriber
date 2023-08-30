@@ -17,9 +17,9 @@ class FormantSubscriber(Node):
         self.front_low =(1.0,-0.6,0.8,0.707,0.0,0.707,0.0)
         self.lower =(1.0,-0.6,0.5,0.707,0.0,0.707,0.0)
 
-
-
         super().__init__('formant_subscriber')
+       
+       
         self.subscription_Top_high = self.create_subscription(
             Bool,
             'Top_high',
@@ -32,7 +32,7 @@ class FormantSubscriber(Node):
             'Top_low',
             self.listener_Top_low,
             10)
-        self.subscription_Top_low  # prevent unused variable warning
+        self.subscription_Top_low 
 
 
         self.subscription_Front_high = self.create_subscription(
@@ -40,30 +40,50 @@ class FormantSubscriber(Node):
             'Front_high',
             self.listener_Front_high,
             10)
-        self.subscription_Front_high  # prevent unused variable warning
+        self.subscription_Front_high  
 
         self.subscription_Front_mid = self.create_subscription(
             Bool,
             'Front_mid',
             self.listener_Front_mid,
             10)
-        self.subscription_Front_mid  # prevent unused variable warning
+        self.subscription_Front_mid  
 
         self.subscription_Front_low = self.create_subscription(
             Bool,
             'Front_low',
             self.listener_Front_low,
             10)
-        self.subscription_Front_low  # prevent unused variable warning
+        self.subscription_Front_low  
 
         self.subscription_Lower = self.create_subscription(
             Bool,
             'Lower',
             self.listener_Lower,
             10)
-        self.subscription_Lower  # prevent unused variable warning
+        self.subscription_Lower  
 
         self.publisher_ = self.create_publisher(PickTask, 'pick_task', 10)
+
+        #######################################################################
+        ########### subscriber for bot sate ready and clear cost map ###########
+
+        self.subscription_state_ready = self.create_subscription(
+            Bool,
+            'state_ready',
+            self.stateReady(),
+            10)
+        self.subscription_state_ready
+
+
+################# for clear cost map ###############
+        self.subscription_clearCostMap = self.create_subscription(
+            Bool,
+            'ClearCostMap',
+            self.clearCostMap(),
+            10)
+        self.subscription_clearCostMap
+
 
 
 
@@ -111,6 +131,23 @@ class FormantSubscriber(Node):
         pick_task.task_type = 'move'
         pick_task.data = positions
         self.publisher_.publish(pick_task)
+
+
+
+    # this fn handles the bot state command
+
+
+
+    def stateReady(self, msg):
+        
+
+
+    def clearCostMap(self, msg):
+
+
+
+
+    
 
 
 
