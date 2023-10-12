@@ -1,8 +1,11 @@
 import rclpy
 from rclpy.node import Node
 
+from std_msgs.msg import Int32
 from std_msgs.msg import Bool
+
 from rightbot_interfaces.msg import PickTask
+import os
 
 
 class FormantSubscriber(Node):
@@ -61,29 +64,32 @@ class FormantSubscriber(Node):
             'Lower',
             self.listener_Lower,
             10)
-        self.subscription_Lower  
+        self.subscription_Lower 
+
+        self.subscription_local = self.create_subscription(
+            Int32,
+            '/local_test_ip',
+            self.Local_interface,
+            10)
+        self.subscription_Lower 
 
         self.publisher_ = self.create_publisher(PickTask, 'pick_task', 10)
 
-        #######################################################################
-        ########### subscriber for bot sate ready and clear cost map ###########
-
-        self.subscription_state_ready = self.create_subscription(
+          # camera left align
+        self.subscription_camera_align_right = self.create_subscription(
             Bool,
-            'state_ready',
-            self.stateReady(),
+            'camera_align_right',
+            self.camera_align_right,
             10)
-        self.subscription_state_ready
+        self.subscription_camera_align_right
 
-
-################# for clear cost map ###############
-        self.subscription_clearCostMap = self.create_subscription(
+        # camera right align
+        self.subscription_camera_align_left = self.create_subscription(
             Bool,
-            'ClearCostMap',
-            self.clearCostMap(),
+            'camera_align_left',
+            self.camera_align_left,
             10)
-        self.subscription_clearCostMap
-
+        self.subscription_camera_align_left
 
 
 
@@ -121,9 +127,43 @@ class FormantSubscriber(Node):
             self.get_logger().info("listener_Lower "+str(msg.data))
             self.publish_position(self.lower)
 
-    
+    def camera_align_right(self, msg):
+        if(msg.data):
+            self.get_logger().info("camera_align_right "+str(msg.data))
+            os.system("""ros2 service call camera_align rightbot_interfaces/srv/CameraAlign "{auto_align: true, camera_name: 'right_camera'}" """)
+
+    def camera_align_left(self, msg):
+        if(msg.data):
+            self.get_logger().info("camera_align_left "+str(msg.data))
+            os.system("""ros2 service call camera_align rightbot_interfaces/srv/CameraAlign "{auto_align: true, camera_name: 'left_camera'}" """)
+
+
+    def Local_interface(self, msg):
+        if(msg.data == 1):
+            self.listener_Front_high
+
+        if(msg.data == 2):
+            self.listener_Front_mid
+
+        if(msg.data == 3):
+            self.listener_Front_low
+
+        if(msg.data == 4):
+            self.camera_align_left
+
+        if(msg.data == 5):
+            self.camera_align_right
+
+        if(msg.data == 6):
+            os.system("""ros2 service call /gripper_pump_control rightbot_interfaces/srv/Gripper""")
+            
+        if(msg.data == 7):
+            os.system("""ros2 service call /task_manager/clear_octomap std_srvs/srv/Empty""")
+
+        if(msg.data == 1):
+            pass
         
-        
+
     def publish_position(self, positions):
         pick_task = PickTask()
         self.task_id = self.task_id + 1
@@ -131,24 +171,6 @@ class FormantSubscriber(Node):
         pick_task.task_type = 'move'
         pick_task.data = positions
         self.publisher_.publish(pick_task)
-
-
-
-    # this fn handles the bot state command
-
-
-
-    def stateReady(self, msg):
-        
-
-
-    def clearCostMap(self, msg):
-
-
-
-
-    
-
 
 
 
