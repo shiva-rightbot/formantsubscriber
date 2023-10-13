@@ -139,7 +139,6 @@ class FormantSubscriber(Node):
 
 
     def Local_interface(self, msg):
-        self.get_logger().info(msg.data)
         if(msg.data == 1):
             self.publish_position(self.front_high)
             self.get_logger().info("front top")
