@@ -139,24 +139,25 @@ class FormantSubscriber(Node):
 
 
     def Local_interface(self, msg):
+        self.get_logger().info(msg.data)
         if(msg.data == 1):
-            self.listener_Front_high
+            self.publish_position(self.front_high)
             self.get_logger().info("front top")
 
         if(msg.data == 2):
-            self.listener_Front_mid
+            self.publish_position(self.front_mid)
             self.get_logger().info("front mid")
 
         if(msg.data == 3):
-            self.listener_Front_low
+            self.publish_position(self.front_low)
             self.get_logger().info("front low")
 
         if(msg.data == 4):
-            self.camera_align_left
+            os.system("""ros2 service call camera_align rightbot_interfaces/srv/CameraAlign "{auto_align: true, camera_name: 'left_camera'}" """)
             self.get_logger().info("camera align left")
 
         if(msg.data == 5):
-            self.camera_align_right
+            os.system("""ros2 service call camera_align rightbot_interfaces/srv/CameraAlign "{auto_align: true, camera_name: 'left_camera'}" """)
             self.get_logger().info("camera align right")
 
         if(msg.data == 6):
@@ -173,8 +174,10 @@ class FormantSubscriber(Node):
         self.task_id = self.task_id + 1
         pick_task.task_id = self.task_id
         pick_task.task_type = 'move'
+        pick_task.pose_nos = 1
         pick_task.data = positions
         self.publisher_.publish(pick_task)
+    # this fn handles the bot state command
 
 
 
